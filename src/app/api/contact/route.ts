@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
   /** The business inbox that receives every new lead notification. */
   const BUSINESS_EMAIL =
-    process.env.BUSINESS_EMAIL ?? "hello@myscapez.com.au";
+    process.env.BUSINESS_EMAIL ?? "admin@myscapez.com";
 
   /** The verified "From" address configured in your Resend domain. */
   const FROM_EMAIL =
