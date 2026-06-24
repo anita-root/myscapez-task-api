@@ -1,0 +1,9 @@
+{
+  "extends": [
+    "development",
+    "node"
+  ],
+  // This configuration extends the 'development' and 'node' presets
+  // providing default rules and settings for Node.js development environments
+  // For more information, see: https://github.com/evanw/esbuild/issues/1234
+}

@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* NAVBAR + NAV CARD STYLES */
+:root {
+  --nav-bg-color: rgba(10, 10, 10, 0.65);
+  --nav-card-bg: rgba(255,255,255,0.02);
+  --nav-border-green: #10b981;
+}
+
+/* Background for the header/navbar */
+.nav-bg {
+  background-color: var(--nav-bg-color);
+}
+
+@layer components {
+  .nav-card {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.9rem;
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.925rem;
+    border-radius: 0.6rem;
+    background: var(--nav-card-bg);
+    border: 2px solid transparent;
+    transition: transform 150ms ease, box-shadow 150ms ease;
+    overflow: visible;
+  }
+
+  .nav-card::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    background: conic-gradient(from 0turn, var(--nav-border-green), #34d399, var(--nav-border-green));
+    z-index: 0;
+    opacity: 0;
+    filter: blur(6px);
+    transition: opacity .18s ease;
+  }
+
+  .nav-card:hover::before {
+    opacity: 1;
+    animation: nav-border-spin 1.6s linear infinite;
+  }
+
+  .nav-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .nav-card.circle {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border-radius: 9999px;
+  }
+
+  .nav-cta {
+    padding: 0.6rem 1.1rem;
+  }
+
+  @keyframes nav-border-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Ensure text stays above the pseudo-element */
+  .nav-card, .nav-card * { position: relative; z-index: 2; }
+
+  /* Spacing helper - increase space after logo for the nav links */
+  .nav-gap-left { margin-left: 1.5rem; }
+}

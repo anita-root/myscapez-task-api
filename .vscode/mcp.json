@@ -1,0 +1,9 @@
+{
+	"servers": {
+		"Resend": {
+			"url": "https://resend.com/docs/mcp",
+			"type": "http"
+		}
+	},
+	"inputs": []
+}
