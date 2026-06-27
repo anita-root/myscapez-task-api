@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -52,3 +53,7 @@ MYSCAPEZ_ADMIN_EMAIL=hello@myscapez.com.au
 
 The form submissions on the site post to `/api/leads`, which will generate a 10% promo code and email both the admin and the lead using `src/lib/resend.ts`.
 
+=======
+# myscapez-task-api
+Myscapez Websites for landscapers Australia
+>>>>>>> fd7b999d9571aee03804e088ae67d62f93d61f81
