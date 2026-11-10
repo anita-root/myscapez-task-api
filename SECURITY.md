@@ -36,7 +36,7 @@ Checked on 21 October 2026. Nothing found to rotate.
 - There is no account system. Typing an email does not prove identity, so this is not a defence against account takeover once records leave the browser.
 - Customer and business contact details still sit in `localStorage` on that browser for the matching preview. Hiding them on the page is not the same as access control.
 - MongoDB is supported but not connected on Vercel yet. When `MONGODB_URI` is set, `POST /api/leads` writes to the `leads` collection and `POST /api/listings` writes to `listings` with `status: "pending-review"`. Nothing reads them back on the site yet, and businesses are not told about a lead. The restore steps below have not been run.
-- Slack and Resend are not connected. Nothing is emailed.
+- Slack is not connected. Resend sends booking emails when `RESEND_API_KEY` is set.
 - GitHub refused to enable code scanning and secret scanning on this private repository because Advanced Security is not purchased. The CodeQL job runs, then cannot upload results.
 - High dependency findings remain inside the unused `shadcn` tool chain. `braces` has no published fix. The site does not import `shadcn`.
 
@@ -47,6 +47,8 @@ MongoDB (for example MongoDB Atlas) replaces the earlier Neon plan. The connecti
 - Set `MONGODB_URI` and, if the database is not called `myscapez`, `MONGODB_DB` on the Vercel project. See `.env.example`.
 - The server refuses to start if `MONGODB_URI` is not `mongodb://` or `mongodb+srv://`, has no password, turns TLS off or accepts invalid certificates, or uses an owner login (`root`, `admin`, `administrator`, `mongo`, `mongodb`, `atlasAdmin`, `owner`). The application user must be a separate database user with `readWrite` on the `myscapez` database only. Do not give it `dbAdmin`, `atlasAdmin` or cluster roles.
 - In Atlas Network Access, allow only the addresses that need it. Vercel functions do not have fixed addresses on every plan; if `0.0.0.0/0` is used, the limited user and a long random password are the remaining protection.
+- Bookings: the request form uses a calendar of days from tomorrow to 60 days ahead (Brisbane time, no Sundays), each with a morning and afternoon window. Each window holds `BOOKING_SLOTS_PER_WINDOW` jobs (default 4). A booking takes its spot in `bookingSlots` with one conditional increment, so two customers cannot both take the last spot. If the lead then fails to save, the spot is given back. `GET /api/availability` returns only counts of remaining spots, never customer details.
+- Booking emails: when `RESEND_API_KEY` is set, the customer gets a plain-text confirmation from `RESEND_FROM_EMAIL` (default `MyScapez <bookings@myscapez.com>`, which must be on a domain verified in Resend), and `LEAD_RECIPIENT_EMAIL` (or `MYSCAPEZ_ADMIN_EMAIL`, or admin@myscapez.com) gets the booking with contact details. A failed send does not cancel the booking. No SMS is sent.
 - Every stored value is reduced to plain strings or allowed list values before it reaches MongoDB, so a request cannot send query operators. The same enquiry is refused for 30 minutes across every server instance by looking for its fingerprint in the database. Client addresses are not stored.
 - Without `MONGODB_URI` the forms behave as before and nothing is written on the server. If the database cannot be reached, the form returns the usual error and the server logs `myscapez form-error`.
 - Backups: turn on Atlas continuous backup or scheduled snapshots before collecting real customer details. No backup has been taken and no restore has been tested.
@@ -61,7 +63,7 @@ To turn off a compromised integration, delete its variable in the Vercel project
 | Variable | What deleting it does |
 |---|---|
 | `TURNSTILE_SECRET_KEY` | The form check stops. The site keeps working. |
-| `RESEND_API_KEY` | Nothing sends mail today, because Resend is not called. |
+| `RESEND_API_KEY` | Booking confirmation emails stop. Bookings are still taken. |
 | `SLACK_WEBHOOK_URL` | Nothing posts to Slack today, because Slack is not called. |
 | `MONGODB_URI` | The app starts with no database. Leads and listings are not stored on the server. |
 | `SESSION_SECRET` | No server session reads it yet. |

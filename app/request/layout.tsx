@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Request a mower",
-  description: "Request lawn work in a South East Queensland suburb. The job is matched to a business that does that work in that suburb.",
+  title: "Book a mow",
+  description: "Book lawn mowing, edging or garden work in South East Queensland. Pick a day and time window, and the job goes to a local crew that services your suburb.",
   alternates: { canonical: "/request" },
 }
 

@@ -15,6 +15,9 @@ export type LeadRecord = {
   extras: string[]
   preferredDay: string
   photoCount: number
+  reference: string
+  bookingDate: string
+  bookingWindow: string
 }
 
 export type ListingRecord = {
@@ -51,7 +54,7 @@ async function saveOnce(collection: "leads" | "listings", fingerprint: string, r
 }
 
 export function saveLead(fingerprint: string, lead: LeadRecord) {
-  return saveOnce("leads", fingerprint, { ...lead, status: "new" })
+  return saveOnce("leads", fingerprint, { ...lead, status: "booked" })
 }
 
 /** A listing is not public until someone has reviewed it. */

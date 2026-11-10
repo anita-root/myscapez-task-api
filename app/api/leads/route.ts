@@ -7,6 +7,9 @@ import { noteAbuse, reportCode } from "@/lib/incident"
 import { countEnquiry } from "@/lib/measure"
 import { readServerEnv } from "@/lib/server/env"
 import { saveLead } from "@/lib/server/records"
+import { bookingReference, releaseSlot, reserveSlot } from "@/lib/server/bookings"
+import { sendBookingEmails } from "@/lib/server/booking-email"
+import { bookingWindowById, isBookableDate } from "@/lib/booking"
 
 export const dynamic = "force-dynamic"
 
@@ -47,7 +50,9 @@ async function receiveLead(request: Request) {
     photoCount: body.value.photoCount,
   })
   const category = knownJobIds([body.value.category])[0] || ""
-  if (person.name.length < 2 || !person.email || person.phone.length < 10 || !person.suburb || !category || !details.propertyType || !details.lawnSize || !details.frequency) {
+  const bookingDate = body.value.bookingDate
+  const bookingWindow = bookingWindowById(body.value.bookingWindow)?.id
+  if (person.name.length < 2 || !person.email || person.phone.length < 10 || !person.suburb || !category || !details.propertyType || !details.lawnSize || !details.frequency || !isBookableDate(bookingDate) || !bookingWindow) {
     return NextResponse.json({ error: formErrors.invalid }, { status: 400 })
   }
   if (!(await turnstilePasses(body.value.turnstileToken, readServerEnv("TURNSTILE_SECRET_KEY"), ip))) {
@@ -55,8 +60,24 @@ async function receiveLead(request: Request) {
   }
   const key = await fingerprint(["lead", person.email, person.phone, person.suburb, category])
   if (alreadyReceived(key)) return NextResponse.json({ error: formErrors.duplicate }, { status: 409 })
-  const saved = await saveLead(key, { ...person, category, ...details })
-  if (saved === "duplicate") return NextResponse.json({ error: formErrors.duplicate }, { status: 409 })
+  const slot = await reserveSlot(bookingDate, bookingWindow)
+  if (slot === "full") return NextResponse.json({ error: formErrors.full }, { status: 409 })
+  const reference = bookingReference()
+  let saved
+  try {
+    saved = await saveLead(key, { ...person, category, ...details, preferredDay: bookingDate, reference, bookingDate, bookingWindow })
+  } catch (error) {
+    if (slot === "reserved") await releaseSlot(bookingDate, bookingWindow).catch(() => undefined)
+    throw error
+  }
+  if (saved === "duplicate") {
+    if (slot === "reserved") await releaseSlot(bookingDate, bookingWindow).catch(() => undefined)
+    return NextResponse.json({ error: formErrors.duplicate }, { status: 409 })
+  }
+  const confirmed = saved === "stored"
+  const emailed = confirmed
+    ? await sendBookingEmails({ reference, ...person, category, bookingDate, bookingWindow, propertyType: details.propertyType, lawnSize: details.lawnSize, frequency: details.frequency, extras: details.extras })
+    : false
   await countEnquiry("lead")
 
   return NextResponse.json({
@@ -67,7 +88,12 @@ async function receiveLead(request: Request) {
     lawnSize: details.lawnSize,
     frequency: details.frequency,
     extras: details.extras,
-    preferredDay: details.preferredDay,
+    preferredDay: bookingDate,
     photoCount: details.photoCount,
+    bookingDate,
+    bookingWindow,
+    reference: confirmed ? reference : "",
+    confirmed,
+    emailed,
   })
 }
