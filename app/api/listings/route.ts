@@ -8,6 +8,7 @@ import { uploadAttempt } from "@/lib/quote-photos"
 import { noteAbuse, reportCode } from "@/lib/incident"
 import { countEnquiry } from "@/lib/measure"
 import { readServerEnv } from "@/lib/server/env"
+import { saveListing } from "@/lib/server/records"
 
 export const dynamic = "force-dynamic"
 
@@ -51,6 +52,8 @@ async function receiveListing(request: Request) {
   }
   const key = await fingerprint(["listing", email, phone, postcode])
   if (alreadyReceived(key)) return NextResponse.json({ error: formErrors.duplicate }, { status: 409 })
+  const saved = await saveListing(key, { firstName, lastName, email, phone, postcode, trade, suburbs, headline, about, abn: hasAbn === "Yes" ? abn : "" })
+  if (saved === "duplicate") return NextResponse.json({ error: formErrors.duplicate }, { status: 409 })
   await countEnquiry("listing")
   return NextResponse.json({ ok: true })
 }

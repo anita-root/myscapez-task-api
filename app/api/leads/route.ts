@@ -6,6 +6,7 @@ import { uploadAttempt } from "@/lib/quote-photos"
 import { noteAbuse, reportCode } from "@/lib/incident"
 import { countEnquiry } from "@/lib/measure"
 import { readServerEnv } from "@/lib/server/env"
+import { saveLead } from "@/lib/server/records"
 
 export const dynamic = "force-dynamic"
 
@@ -54,6 +55,8 @@ async function receiveLead(request: Request) {
   }
   const key = await fingerprint(["lead", person.email, person.phone, person.suburb, category])
   if (alreadyReceived(key)) return NextResponse.json({ error: formErrors.duplicate }, { status: 409 })
+  const saved = await saveLead(key, { ...person, category, ...details })
+  if (saved === "duplicate") return NextResponse.json({ error: formErrors.duplicate }, { status: 409 })
   await countEnquiry("lead")
 
   return NextResponse.json({
