@@ -13,7 +13,7 @@
     "@vercel/analytics": "1.6.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.16.0",
+    "lucide-react": "^1.70.0",
     "mongodb": "^6.22.0",
     "next": "16.4.6",
     "react": "^19",
