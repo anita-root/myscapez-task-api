@@ -132,7 +132,7 @@ function DashboardPage() {
           </div>
           <div className="rounded-[28px] border border-white/10 p-6 text-sm leading-6 text-[#9aa995]">
             <h2 className="text-lg font-semibold text-[#f2f6ef]">Where this will live</h2>
-            <p className="mt-2">Neon holds the lead, customer and business rows. Resend sends the emails. Slack gets the notification. Vercel hosts the app and Cloudflare serves DNS. None of those accounts are connected in this preview, so the match is stored in this browser only.</p>
+            <p className="mt-2">MongoDB holds the lead and business listing records once MONGODB_URI is set. Resend sends the emails. Slack gets the notification. Vercel hosts the app and Cloudflare serves DNS. Until then, and for the matching shown here, the match is stored in this browser only.</p>
           </div>
         </div>
       </section>

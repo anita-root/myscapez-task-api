@@ -35,7 +35,7 @@ jobs:
 
       - name: Refuse public secret names
         run: |
-          if git grep -nE 'NEXT_PUBLIC_(DATABASE_URL|RESEND_API_KEY|SLACK_WEBHOOK_URL|SESSION_SECRET|TURNSTILE_SECRET_KEY)' -- '*.ts' '*.tsx' '*.js' '*.mjs'; then
+          if git grep -nE 'NEXT_PUBLIC_(MONGODB_URI|RESEND_API_KEY|SLACK_WEBHOOK_URL|SESSION_SECRET|TURNSTILE_SECRET_KEY)' -- '*.ts' '*.tsx' '*.js' '*.mjs'; then
             echo "A server secret is marked public."
             exit 1
           fi

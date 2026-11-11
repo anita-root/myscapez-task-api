@@ -29,5 +29,5 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "lib/owner-access.test.ts", "lib/database-role.test.ts", "lib/quote-photos.test.ts", "lib/incident.test.ts"]
+  "exclude": ["node_modules", "lib/owner-access.test.ts", "lib/database-role.test.ts", "lib/quote-photos.test.ts", "lib/incident.test.ts", "lib/booking.test.ts"]
 }
